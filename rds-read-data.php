@@ -82,7 +82,8 @@ if ( $mode=="remove")
  mysql_query ("DELETE FROM address where id=$id");
  Print "Entry has been removed <p>";
  }
- $columns = mysql_query("SHOW columns from $RDS_DB")
+ $columns = mysql_query("SHOW columns from address")
+ or die(mysql_error());
  $data = mysql_query("SELECT * FROM address ORDER BY lastname ASC")
  or die(mysql_error());
  Print "<table class='table table-bordered'>";
