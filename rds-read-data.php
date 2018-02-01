@@ -3,7 +3,6 @@
   //This is a simple address book example for testing with RDS
 
   include('rds.conf.php');
-
   // Set address book variables
   isset($_REQUEST['mode']) ? $mode=$_REQUEST['mode'] : $mode="";
   isset($_REQUEST['id']) ? $id=$_REQUEST['id'] : $id="";
@@ -49,7 +48,7 @@ if ( $mode=="edit")
  echo $_SERVER['PHP_SELF'];
  Print '
  method=post>
- <table class='table table-bordered'>
+ <table class="table table-bordered">
  <tr><td>First Name:</td><td><input type="text" value="';
  Print $firstname;
  print '" name="firstname" /></td></tr>
@@ -82,24 +81,40 @@ if ( $mode=="remove")
  mysql_query ("DELETE FROM address where id=$id");
  Print "Entry has been removed <p>";
  }
+ 
  $columns = mysql_query("SHOW columns from address")
  or die(mysql_error());
  $data = mysql_query("SELECT * FROM address ORDER BY lastname ASC")
  or die(mysql_error());
  Print "<table class='table table-bordered'>";
- Print "<tr>"
- while($info = mysql_fetch_array( $columns ))
+ Print "<tr>";
+ while($info2 = mysql_fetch_array( $columns ))
  {
-	Print "<th width=100>" . $info['Field'] . "</th>"
+	if ($info2['Field'] != "id"){
+	 Print "<th width=100>" . $info2['Field'] . "</th>";
+    }
  }
- Print "<th width=100 colspan=2>Admin</th></tr>"
- Print "<td colspan=5 align=right> " .
+ Print "<th width=100 colspan=2>Admin</th></tr>";
+ Print "<td colspan=" . (mysql_num_rows($columns)+1) . " align=right> " .
    "<a href=" .$_SERVER['PHP_SELF']. "?mode=add>Add Contact</a></td>";
  while($info = mysql_fetch_array( $data ))
  {
- Print "<tr><td>".$info['name'] . "</td> ";
- Print "<td>".$info['phone'] . "</td> ";
- Print "<td> <a href=mailto:".$info['email'] . ">" .$info['email'] . "</a></td>";
+	  $columns = mysql_query("SHOW columns from address") or die(mysql_error());
+  print"<tr>";
+	 while($info2 = mysql_fetch_array($columns))
+	 {
+		 if($info2['Field'] != "id")
+		 {
+			 if($info2['Field'] == "email")
+			 {
+				 Print "<td> <a href=mailto:".$info['email'] . ">" .$info['email'] . "</a></td>";
+			 }
+			 else{
+				 $columnName = $info2['Field'];
+				Print"<td>" . $info[$info2['Field']] . "</td>";
+			 }
+		 }
+	 }
  Print "<td><a href=" .$_SERVER['PHP_SELF']. "?id=" . $info['id'] ."&firstname=" . $info['firstname'] ."&lastname=" . $info['lastname'] . "&phone=" . $info['phone'] ."&email=" . $info['email'] . "&mode=edit>Edit</a></td>";
  Print "<td><a href=" .$_SERVER['PHP_SELF']. "?id=" . $info['id'] ."&mode=remove>Remove</a></td></tr>";
  }
